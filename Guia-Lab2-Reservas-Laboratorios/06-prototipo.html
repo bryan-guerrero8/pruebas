@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema de Reservas de Laboratorios Universitarios</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f3f5f7;color:#202833}
+header{background:#17324d;color:#fff;padding:22px 7%}
+main{max-width:1000px;margin:28px auto;padding:0 18px}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+nav a{color:#17324d;background:#fff;border:1px solid #ccd4dc;padding:10px 14px;text-decoration:none;border-radius:5px}
+.panel{background:#fff;border:1px solid #d6dce2;border-radius:8px;padding:20px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+label{display:block;font-weight:bold;margin:12px 0 5px}
+input,select,textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid #aeb8c2;border-radius:4px}
+button{background:#176b87;color:#fff;border:0;border-radius:4px;padding:11px 16px;margin-top:16px;cursor:pointer}
+table{border-collapse:collapse;width:100%;margin-top:10px}
+th,td{padding:10px;border:1px solid #d6dce2;text-align:left}
+th{background:#e9eef2}
+small{color:#5c6873}
+</style>
+</head>
+<body>
+<header>
+<h1>Reservas de Laboratorios Universitarios</h1>
+<p>Consulta de disponibilidad y gestión de solicitudes</p>
+</header>
+<main>
+<nav>
+<a href="#disponibilidad">Disponibilidad</a>
+<a href="#solicitud">Nueva solicitud</a>
+<a href="#historial">Mis solicitudes</a>
+</nav>
+<section class="panel" id="disponibilidad">
+<h2>Consultar disponibilidad</h2>
+<div class="grid">
+<div><label for="fecha">Fecha</label><input id="fecha" type="date"></div>
+<div><label for="turno">Bloque horario</label><select id="turno"><option>08:00–10:00</option><option>10:00–12:00</option><option>14:00–16:00</option><option>16:00–18:00</option></select></div>
+</div>
+<button type="button" onclick="consultar()">Consultar</button>
+<p id="resultado" aria-live="polite"><small>Selecciona fecha y bloque para consultar.</small></p>
+</section>
+<section class="panel" id="solicitud">
+<h2>Nueva solicitud</h2>
+<form id="formulario">
+<div class="grid">
+<div><label for="laboratorio">Laboratorio</label><select id="laboratorio" required><option value="">Seleccionar</option><option>Laboratorio 1</option><option>Laboratorio 2</option><option>Laboratorio 3</option></select></div>
+<div><label for="fechaReserva">Fecha</label><input id="fechaReserva" type="date" required></div>
+<div><label for="inicio">Hora de inicio</label><input id="inicio" type="time" required></div>
+<div><label for="fin">Hora de fin</label><input id="fin" type="time" required></div>
+</div>
+<label for="motivo">Motivo académico</label><textarea id="motivo" rows="3" required></textarea>
+<button type="submit">Enviar solicitud</button>
+<p id="mensaje" aria-live="polite"></p>
+</form>
+</section>
+<section class="panel" id="historial">
+<h2>Mis solicitudes</h2>
+<table><thead><tr><th>Laboratorio</th><th>Fecha</th><th>Horario</th><th>Estado</th></tr></thead><tbody id="filas"><tr><td colspan="4">No hay solicitudes registradas en esta sesión.</td></tr></tbody></table>
+</section>
+</main>
+<script>
+function consultar(){
+ const fecha=document.getElementById('fecha').value;
+ const turno=document.getElementById('turno').value;
+ document.getElementById('resultado').textContent=fecha?('Consulta de ejemplo: '+fecha+', '+turno+'. La disponibilidad debe confirmarse con el sistema institucional.'): 'Selecciona una fecha para continuar.';
+}
+document.getElementById('formulario').addEventListener('submit',function(e){
+ e.preventDefault();
+ const lab=document.getElementById('laboratorio').value;
+ const fecha=document.getElementById('fechaReserva').value;
+ const inicio=document.getElementById('inicio').value;
+ const fin=document.getElementById('fin').value;
+ const motivo=document.getElementById('motivo').value.trim();
+ if(fin<=inicio){document.getElementById('mensaje').textContent='La hora de fin debe ser posterior a la hora de inicio.';return;}
+ if(!motivo){document.getElementById('mensaje').textContent='Ingresa el motivo académico.';return;}
+ const filas=document.getElementById('filas');
+ if(filas.children.length===1 && filas.children[0].children.length===1)filas.innerHTML='';
+ const tr=document.createElement('tr');
+ [lab,fecha,inicio+'–'+fin,'Pendiente'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
+ filas.appendChild(tr);
+ document.getElementById('mensaje').textContent='Solicitud registrada como ejemplo en esta sesión.';
+ this.reset();
+});
+</script>
+</body>
+</html>
